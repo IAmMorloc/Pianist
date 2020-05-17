@@ -35,7 +35,6 @@ namespace Pianist
 			//};
 		}
 
-
 		public override void Load()
 		{
 			// Will show up in client.log under the ExampleMod name

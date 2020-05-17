@@ -6,7 +6,6 @@ using static Terraria.ModLoader.ModContent;
 
 namespace Pianist
 {
-	// In this class we separate recipe related code from our main class
 	public static class RecipeHelper
 	{
 		private static void MakeSimpleRecipe(Mod mod, int ingredient, int resultType, int ingredientStack = 1, int resultStack = 1, string reqTile = null)
@@ -24,14 +23,14 @@ namespace Pianist
 			recipe.AddRecipe(); // finally, add the recipe
 		}
 
-		// Add recipes
 		public static void AddRecipes(Mod mod)
 		{
-			// ExampleItem crafts into the following items
-			// Check the method signature of MakeSimpleRecipes for the arguments, this is a method signature:
-			// private static void MakeSimpleRecipe(Mod mod, string modIngredient, short resultType, int ingredientStack = 1, int resultStack = 1, string reqTile = null) 
-
-			MakeSimpleRecipe(mod, ItemID.Wood, ModContent.ItemType<Drumstick>(), 1);
+			MakeSimpleRecipe(mod, ItemID.Wood, ItemType<Drumstick>(), 2);
+			MakeSimpleRecipe(mod, ItemID.Wood, ItemType<TiktokSquare>(), 4);
+			MakeSimpleRecipe(mod, ItemID.Wood, ItemID.Wire, 1, 99);
+			MakeSimpleRecipe(mod, ItemID.Wood, ItemID.Switch, 1, 1);
+			MakeSimpleRecipe(mod, ItemID.Wood, ItemID.Wrench, 1, 1);
+			MakeSimpleRecipe(mod, ItemID.Wood, ItemType<ExampleMech>(), 1, 1);
 
 		}
 	}
