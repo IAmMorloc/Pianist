@@ -16,7 +16,6 @@ namespace Pianist.Tiles
 	{
 		public override void SetDefaults()
 		{
-			Main.tileFrameImportant[Type] = true;
 			Main.tileObsidianKill[Type] = true;
 
 			TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);

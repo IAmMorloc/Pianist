@@ -27,7 +27,7 @@ namespace Pianist.Items
 			item.useTime = 10;
 			item.useStyle = ItemUseStyleID.SwingThrow;
 			item.consumable = true;
-			item.createTile = TileType<Tiles.TiktokSquare>();
+			item.createTile = TileType<Tiles.Keyboard>();
 		}
 	}
 }

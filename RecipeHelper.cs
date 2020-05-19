@@ -31,7 +31,7 @@ namespace Pianist
 			MakeSimpleRecipe(mod, ItemID.Wood, ItemID.Switch, 1, 1);
 			MakeSimpleRecipe(mod, ItemID.Wood, ItemID.Wrench, 1, 1);
 			MakeSimpleRecipe(mod, ItemID.Wood, ItemType<ExampleMech>(), 1, 1);
-
+			MakeSimpleRecipe(mod, ItemID.Wood, ItemType<Tuner>(), 1, 1);
 		}
 	}
 }
