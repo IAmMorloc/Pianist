@@ -1,11 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria.ModLoader;
 using static Terraria.ModLoader.ModContent;
 
@@ -17,13 +12,13 @@ namespace Pianist.Tiles
 		{
 			Main.tileLighted[Type] = true;
 			Main.tileFrameImportant[Type] = true; //是否有边框。关闭时自动调整sprite。
-												  //Main.tileNoAttach[Type] = true;
 			Main.tileLavaDeath[Type] = true;
 			drop = ItemType<Items.TiktokSquare>();
 		}
 		public override void PlaceInWorld(int i, int j, Item item)
 		{
 			Tile tile = Main.tile[i, j];
+			tile.frameX = 0;
 			tile.frameY = 0;
 			if (Main.netMode == NetmodeID.MultiplayerClient)
 			{
@@ -33,10 +28,10 @@ namespace Pianist.Tiles
 
 		public override bool NewRightClick(int i, int j)
 		{
-			int encPitch = GetPitch(i, j);
-			//string soundsFileName = "piano_" + (encPitch & 15) + "-1";
+			int soundCode = GetSoundCode(i, j);
+			string fileName = PitchHelper.GetPitchSoundsFileName(soundCode);
 			float offset = 0f;
-			switch (encPitch >> 4) {
+			switch (PitchHelper.DecodeOctave(soundCode)) {
 				case 3:
 					offset = -1f; break;
 				case 4:
@@ -44,14 +39,17 @@ namespace Pianist.Tiles
 				case 5:
 					offset = 1f; break;
 			}
-			Main.PlaySound(SoundLoader.customSoundType, i * 16 + 8, j * 16, mod.GetSoundSlot(SoundType.Custom, "Sounds/Custom/a-1"), 1f, offset);
+			int dust = Dust.NewDust(new Vector2(i * 16 - 6, j * 16 - 2), 0, 0, DustType<Dusts.MusicalNote>());
+			Main.dust[dust].velocity.X = 0f;
+			Main.dust[dust].velocity.Y = -1f;
+			Main.PlaySound(SoundLoader.customSoundType, i * 16 + 8, j * 16, mod.GetSoundSlot(SoundType.Custom, fileName), 0.4f, offset);
 			return base.NewRightClick(i, j);
 		}
 
 		public override void MouseOver(int i, int j)
 		{
-			int encPitch = GetPitch(i, j);
-			Main.NewText("GetPitch now Octave:" + (encPitch >> 4) + " Name:" +(encPitch & 15));
+			int soundCode = GetSoundCode(i, j);
+			Main.NewText("GetPitch now Octave:" + PitchHelper.DecodeOctave(soundCode) + " Name:" + PitchHelper.DecodePitchName(soundCode));
 			base.MouseOver(i, j);
 		}
 
@@ -69,17 +67,16 @@ namespace Pianist.Tiles
 			{
 				NetMessage.SendTileSquare(-1, Player.tileTargetX, Player.tileTargetY, 1, TileChangeType.None);
 			}
-			Dust.NewDust(new Vector2(i * 16, j * 16), 10, 10, 7);
 			return true;
 		}
 
-		public int GetPitch(int i, int j)
+		public int GetSoundCode(int i, int j)
 		{
 			Tile tile = Main.tile[i, j];
 			int styleX = tile.frameX / 18;
 			int styleY = tile.frameY / 18;
 
-			return ((styleY + 3) << 4) | (styleX + 1);
+			return PitchHelper.EncodeSoundCode((int)EPitchType.Piano, styleY + 3, styleX + 1);
 		}
 	}
 }

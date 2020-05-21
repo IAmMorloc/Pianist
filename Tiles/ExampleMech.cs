@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.Enums;
 using Terraria.GameContent.Generation;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -12,47 +13,67 @@ using static Terraria.ModLoader.ModContent;
 
 namespace Pianist.Tiles
 {
-    class ExampleMech : ModTile
+    class ExampleMech : ModTile, IInstrument
 	{
 		public override void SetDefaults()
 		{
-			Main.tileObsidianKill[Type] = true;
-
-			TileObjectData.newTile.CopyFrom(TileObjectData.Style1x1);
+			Main.tileFrameImportant[Type] = true;
+			Main.tileNoAttach[Type] = true;
+			Main.tileLavaDeath[Type] = true;
+			TileObjectData.newTile.CopyFrom(TileObjectData.Style4x2);
+			TileObjectData.newTile.Width = 4;
+			TileObjectData.newTile.Height = 2;
+			TileObjectData.newTile.Direction = TileObjectDirection.None;
+			TileObjectData.newTile.CoordinateHeights = new int[] { 16, 16 };
+			TileObjectData.newTile.CoordinateWidth = 16;
+			TileObjectData.newTile.CoordinatePadding = 2; 
+			TileObjectData.newTile.Origin = new Point16(2, 1);
+			TileObjectData.newTile.StyleHorizontal = false;
+			TileObjectData.newTile.AnchorBottom = new AnchorData(AnchorType.SolidTile, TileObjectData.newTile.Width, 0);
 			TileObjectData.addTile(Type);
-			ModTranslation name = CreateMapEntryName();
-			name.SetDefault("Example Mech");
-			AddMapEntry(new Color(144, 148, 144), name);
-			dustType = 11;
-			disableSmartCursor = true;
 		}
 
-		public override void HitWire(int i, int j)
+		public override bool NewRightClick(int i, int j)
 		{
-			// Find the coordinates of top left tile square through math
-			int y = j - Main.tile[i, j].frameY / 18;
-			int x = i - Main.tile[i, j].frameX / 18;
-
-			Wiring.SkipWire(x, y);
-
-			// We add 16 to x to spawn right between the 2 tiles. We also want to right on the ground in the y direction.
-			int spawnX = x * 16 + 8;
-			int spawnY = y * 16;
-
-			// If you want to make a NPC spawning statue, see below.
-			if (Wiring.CheckMech(x, y, 60) && Item.MechSpawn(spawnX, spawnY, ItemID.SilverCoin) && Item.MechSpawn(spawnX, spawnY, ItemID.GoldCoin) && Item.MechSpawn(spawnX, spawnY, ItemID.PlatinumCoin))
+			int soundCode = GetSoundCode(i, j);
+			string fileName = PitchHelper.GetPitchSoundsFileName(soundCode);
+			float offset = 0f;
+			switch (PitchHelper.DecodeOctave(soundCode))
 			{
-				int id = ItemID.SilverCoin;
-				if (Main.rand.NextBool(100))
-				{
-					id++;
-					if (Main.rand.NextBool(100))
-					{
-						id++;
-					}
-				}
-				Item.NewItem(spawnX, spawnY, 0, 0, id, 1, false, 0, false);
+				case 3:
+					offset = -1f; break;
+				case 4:
+					offset = 0f; break;
+				case 5:
+					offset = 1f; break;
 			}
+			int dust = Dust.NewDust(new Vector2(i * 16 + 6, j * 16 - 2), 0, 0, DustType<Dusts.MusicalNote>());
+			Main.dust[dust].velocity.X = 0f;
+			Main.dust[dust].velocity.Y = -1f;
+			Main.PlaySound(SoundLoader.customSoundType, i * 16 + 8, j * 16, mod.GetSoundSlot(SoundType.Custom, fileName), 0.6f, offset);
+			return base.NewRightClick(i, j);
+		}
+
+		public override void KillMultiTile(int i, int j, int frameX, int frameY)
+		{
+			Item.NewItem(i * 16, j * 16, 48, 32, ItemType<Items.ExampleMech>());
+		}
+
+		public bool PitchOffset(int i, int j)
+		{
+			return false;
+		}
+
+		private static readonly int[] MicroKeyboardPitchMap = { 3, 6, 10, 12, 1, 5, 8, 13 };
+		public int GetSoundCode(int i, int j)
+		{
+			Tile tile = Main.tile[i, j];
+			int keyIndex = MicroKeyboardPitchMap[tile.frameX / 18 + tile.frameY / 18 * 4];
+			if(keyIndex == 13)
+			{
+				return PitchHelper.EncodeSoundCode((int)EPitchType.Piano, 5, 1);
+			}
+			return PitchHelper.EncodeSoundCode((int)EPitchType.Piano, 4, keyIndex);
 		}
 	}
 }

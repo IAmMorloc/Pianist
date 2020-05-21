@@ -11,7 +11,7 @@ namespace Pianist.Tiles
         //Also implemented for modulation.
         bool PitchOffset(int i, int j);
 
-        int GetPitch(int i, int j);
+        int GetSoundCode(int i, int j);
     }
 
 }
