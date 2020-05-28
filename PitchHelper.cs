@@ -4,7 +4,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using static Terraria.ModLoader.ModContent;
 
-namespace Pianist.Tiles
+namespace Pianist
 {
     public static class PitchHelper
     {
@@ -15,11 +15,31 @@ namespace Pianist.Tiles
 
         public static string GetPitchSoundsFileName(int tone, int octave, int pitchName)
         {
-            if(!octave.Equals(EPitchType.Octave4))
+            if (!octave.Equals(EPitchType.Octave4))
             {
                 return "Sounds/Custom/" + tone + "_" + pitchName + "-4";
             }
             return tone + "_" + pitchName;
+        }
+
+        public static void PlaySound(Mod mod, int soundCode)
+        {
+            PlaySound(mod, soundCode, -1, -1);
+        }
+
+        public static void PlaySound(Mod mod, int soundCode, int x, int y)
+        {
+            float offset = 0f;
+            switch (DecodeOctave(soundCode))
+            {
+                case 3:
+                    offset = -1f; break;
+                case 4:
+                    offset = 0f; break;
+                case 5:
+                    offset = 1f; break;
+            }
+            Main.PlaySound(SoundLoader.customSoundType, x, y, mod.GetSoundSlot(SoundType.Custom, GetPitchSoundsFileName(soundCode)), 0.4f, offset);
         }
 
         public static int EncodeSoundCode(int tone, int octave, int pitchName)

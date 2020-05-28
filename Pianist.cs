@@ -23,6 +23,8 @@ namespace Pianist
 
 		internal PianoUI pianoUI;
 
+		public static ModHotKey instrumentHotKey;
+
 		public Pianist()
 		{
 			// By default, all Autoload properties are True. You only need to change this if you know what you are doing.
@@ -39,6 +41,9 @@ namespace Pianist
 		{
 			// Will show up in client.log under the ExampleMod name
 			Logger.InfoFormat("{0} example logging", Name);
+
+			// Registers a new hotkey
+			instrumentHotKey = RegisterHotKey("Instrument Key", "D"); // See https://docs.microsoft.com/en-us/previous-versions/windows/xna/bb197781(v=xnagamestudio.41) for special keys
 
 			// All code below runs only if we're not loading on a server
 			if (!Main.dedServ)
@@ -60,17 +65,23 @@ namespace Pianist
 			// All code below runs only if we're not loading on a server
 			if (!Main.dedServ)
 			{
-				Main.tileFrame[TileID.Loom] = 0; // Reset the frame of the loom tile
-				Main.tileSetsLoaded[TileID.Loom] = false; // Causes the loom tile to reload its vanilla texture
+
 			}
+			instrumentHotKey = null;
 		}
 
 		public override void UpdateUI(GameTime gameTime)
 		{
 			//当Visible为true时（当UI开启时）
 			if (PianoUI.Visible)
-				//如果exampleUserInterface不是null就执行Update方法
+			{
+				Main.blockInput = true;
 				pianistUserInterface?.Update(gameTime);
+			}
+			else
+			{
+				Main.blockInput = false;
+			}
 			base.UpdateUI(gameTime);
 		}
 

@@ -36,21 +36,10 @@ namespace Pianist.Tiles
 		public override bool NewRightClick(int i, int j)
 		{
 			int soundCode = GetSoundCode(i, j);
-			string fileName = PitchHelper.GetPitchSoundsFileName(soundCode);
-			float offset = 0f;
-			switch (PitchHelper.DecodeOctave(soundCode))
-			{
-				case 3:
-					offset = -1f; break;
-				case 4:
-					offset = 0f; break;
-				case 5:
-					offset = 1f; break;
-			}
+			PitchHelper.PlaySound(mod, soundCode, i * 16 + 8, j * 16);
 			int dust = Dust.NewDust(new Vector2(i * 16 + 6, j * 16 - 2), 0, 0, DustType<Dusts.MusicalNote>());
 			Main.dust[dust].velocity.X = 0f;
 			Main.dust[dust].velocity.Y = -1f;
-			Main.PlaySound(SoundLoader.customSoundType, i * 16 + 8, j * 16, mod.GetSoundSlot(SoundType.Custom, fileName), 0.6f, offset);
 			return base.NewRightClick(i, j);
 		}
 
@@ -64,7 +53,7 @@ namespace Pianist.Tiles
 			return false;
 		}
 
-		private static readonly int[] MicroKeyboardPitchMap = { 3, 6, 10, 12, 1, 5, 8, 13 };
+		private readonly int[] MicroKeyboardPitchMap = { 3, 6, 10, 12, 1, 5, 8, 13 };
 		public int GetSoundCode(int i, int j)
 		{
 			Tile tile = Main.tile[i, j];
